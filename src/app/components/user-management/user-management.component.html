@@ -1,0 +1,195 @@
+<div class="user-management-container">
+  <div class="user-management-header">
+    <div class="container">
+      <div class="header-content">
+        <h1>Gestión de Usuarios</h1>
+        <button class="btn btn-secondary" (click)="goBack()">Volver</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <!-- Formulario para crear nuevo usuario -->
+    <div class="card">
+      <h2>Crear Nuevo Usuario</h2>
+      <form (ngSubmit)="createUser()" class="user-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newUsername">Usuario *</label>
+            <input
+              type="text"
+              id="newUsername"
+              [(ngModel)]="newUser.username"
+              name="newUsername"
+              placeholder="Nombre de usuario"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="newName">Nombre Completo *</label>
+            <input
+              type="text"
+              id="newName"
+              [(ngModel)]="newUser.name"
+              name="newName"
+              placeholder="Nombre completo"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Contraseña *</label>
+            <input
+              type="password"
+              id="newPassword"
+              [(ngModel)]="newUser.password"
+              name="newPassword"
+              placeholder="Contraseña"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="newRole">Rol *</label>
+            <select
+              id="newRole"
+              [(ngModel)]="newUser.role"
+              name="newRole"
+              required
+            >
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">Crear Usuario</span>
+          <span *ngIf="loading">Creando...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <div class="card">
+      <h2>Usuarios del Sistema</h2>
+      <div *ngIf="loading && users.length === 0" class="loading">
+        Cargando usuarios...
+      </div>
+      <div *ngIf="!loading && users.length === 0" class="no-users">
+        No hay usuarios registrados
+      </div>
+      <div *ngIf="users.length > 0" class="users-table">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>Rol</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>
+                <div *ngIf="editingUser?.username !== user.username">
+                  {{ user.username }}
+                </div>
+                <div *ngIf="editingUser && editingUser.username === user.username">
+                  <input
+                    type="text"
+                    [(ngModel)]="editingUser!.username"
+                    class="inline-input"
+                  />
+                </div>
+              </td>
+              <td>
+                <div *ngIf="editingUser?.username !== user.username">
+                  {{ user.name }}
+                </div>
+                <div *ngIf="editingUser && editingUser.username === user.username">
+                  <input
+                    type="text"
+                    [(ngModel)]="editingUser!.name"
+                    class="inline-input"
+                  />
+                </div>
+              </td>
+              <td>
+                <div *ngIf="editingUser?.username !== user.username">
+                  <span class="badge" [class.badge-admin]="user.role === 'admin'">
+                    {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+                  </span>
+                </div>
+                <div *ngIf="editingUser && editingUser.username === user.username">
+                  <select [(ngModel)]="editingUser!.role" class="inline-input">
+                    <option value="user">Usuario</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+              </td>
+              <td>
+                <div *ngIf="editingUser?.username !== user.username" class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    (click)="editUser(user)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="deleteUser(user.username)"
+                    [disabled]="user.role === 'admin'"
+                    title="No se puede eliminar el usuario administrador"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+                <div *ngIf="editingUser?.username === user.username" class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="updateUser()"
+                    [disabled]="loading"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    (click)="cancelEdit()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Formulario de edición (si se necesita contraseña) -->
+    <div *ngIf="editingUser" class="card">
+      <h2>Actualizar Contraseña</h2>
+      <div class="form-group">
+        <label for="editPassword">Nueva Contraseña</label>
+        <input
+          type="password"
+          id="editPassword"
+          [(ngModel)]="editingUser!.password"
+          name="editPassword"
+          placeholder="Dejar vacío para mantener la actual"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+

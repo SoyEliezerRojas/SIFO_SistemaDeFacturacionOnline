@@ -1,0 +1,272 @@
+<div class="invoice-container">
+  <div class="invoice-header">
+    <div class="container">
+      <div class="header-content">
+        <h1>Nueva Factura</h1>
+        <button class="btn btn-secondary" (click)="goBack()">Volver</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <form class="invoice-form">
+      <!-- Información de la Factura -->
+      <div class="card">
+        <h2>Información de la Factura</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="invoiceNumber">Número de Factura</label>
+            <input
+              type="text"
+              id="invoiceNumber"
+              [(ngModel)]="invoice.invoiceNumber"
+              name="invoiceNumber"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Fecha</label>
+            <input
+              type="date"
+              id="date"
+              [(ngModel)]="invoice.date"
+              name="date"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Cliente -->
+      <div class="card">
+        <h2>Información del Cliente</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="supplierName">Nombre del Cliente *</label>
+            <input
+              type="text"
+              id="supplierName"
+              [(ngModel)]="invoice.supplierName"
+              name="supplierName"
+              placeholder="Nombre del cliente"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="supplierContact">Contacto</label>
+            <input
+              type="text"
+              id="supplierContact"
+              [(ngModel)]="invoice.supplierContact"
+              name="supplierContact"
+              placeholder="Teléfono o contacto"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="supplierAddress">Dirección</label>
+            <input
+              type="text"
+              id="supplierAddress"
+              [(ngModel)]="invoice.supplierAddress"
+              name="supplierAddress"
+              placeholder="Dirección del cliente"
+            />
+          </div>
+          <div class="form-group">
+            <label for="supplierEmail">Email *</label>
+            <input
+              type="email"
+              id="supplierEmail"
+              [(ngModel)]="invoice.supplierEmail"
+              name="supplierEmail"
+              placeholder="email@ejemplo.com"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Items de la Factura -->
+      <div class="card">
+        <h2>Items de la Factura</h2>
+        
+        <div class="add-item-section">
+          <h3>Agregar Item</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="itemDescription">Descripción *</label>
+              <input
+                type="text"
+                id="itemDescription"
+                [(ngModel)]="newItem.description"
+                name="itemDescription"
+                placeholder="Descripción del producto/servicio"
+              />
+            </div>
+            <div class="form-group">
+              <label for="itemQuantity">Cantidad *</label>
+              <input
+                type="number"
+                id="itemQuantity"
+                [(ngModel)]="newItem.quantity"
+                name="itemQuantity"
+                min="1"
+                step="1"
+                (ngModelChange)="newItem.totalPrice = (newItem.quantity || 0) * (newItem.unitPrice || 0)"
+              />
+            </div>
+            <div class="form-group">
+              <label for="itemUnitPrice">Precio Unitario *</label>
+              <input
+                type="number"
+                id="itemUnitPrice"
+                [(ngModel)]="newItem.unitPrice"
+                name="itemUnitPrice"
+                min="0"
+                step="0.01"
+                (ngModelChange)="newItem.totalPrice = (newItem.quantity || 0) * (newItem.unitPrice || 0)"
+              />
+            </div>
+            <div class="form-group">
+              <label for="itemTotalPrice">Total</label>
+              <input
+                type="number"
+                id="itemTotalPrice"
+                [(ngModel)]="newItem.totalPrice"
+                name="itemTotalPrice"
+                readonly
+              />
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" (click)="addItem()">Agregar Item</button>
+        </div>
+
+        <div *ngIf="invoice.items && invoice.items.length > 0" class="items-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of invoice.items; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unitPrice | number:'1.2-2' }}</td>
+                <td>{{ item.totalPrice | number:'1.2-2' }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="removeItem(i)"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Información Adicional -->
+      <div class="card">
+        <h2>Información Adicional</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="deliveryTime">Tiempo de Entrega</label>
+            <input
+              type="text"
+              id="deliveryTime"
+              [(ngModel)]="invoice.deliveryTime"
+              name="deliveryTime"
+              placeholder="Ej: 15 días hábiles"
+            />
+          </div>
+          <div class="form-group">
+            <label for="offerValidity">Validez de la Oferta</label>
+            <input
+              type="text"
+              id="offerValidity"
+              [(ngModel)]="invoice.offerValidity"
+              name="offerValidity"
+              placeholder="Ej: 30 días"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="payConditions">Condiciones de Pago</label>
+          <textarea
+            id="payConditions"
+            [(ngModel)]="invoice.payConditions"
+            name="payConditions"
+            placeholder="Condiciones de pago..."
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="notes">Notas</label>
+          <textarea
+            id="notes"
+            [(ngModel)]="invoice.notes"
+            name="notes"
+            placeholder="Notas adicionales..."
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Totales -->
+      <div class="card totals-card">
+        <div class="totals">
+          <div class="total-row">
+            <span class="total-label">Subtotal:</span>
+            <span class="total-value">{{ invoice.subtotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="total-row total-final">
+            <span class="total-label">Total:</span>
+            <span class="total-value">{{ invoice.total | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="action-buttons">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="generatePDF()"
+          [disabled]="loading"
+        >
+          Generar PDF
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="saveInvoice()"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading">Guardar Factura</span>
+          <span *ngIf="loading">Guardando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
