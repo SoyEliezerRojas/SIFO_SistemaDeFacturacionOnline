@@ -36,9 +36,13 @@ jobs:
         run: npm ci
       
       - name: Build
-        run: npm run build -- --base-href /SIFO_SistemaDeFacturacionOnline/
+        run: npm run build -- --configuration production --base-href /SIFO_SistemaDeFacturacionOnline/
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
+      
+      - name: Create 404.html for Angular routing
+        run: |
+          cp dist/sifo/index.html dist/sifo/404.html
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -46,5 +50,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/sifo
+          cname: false
         id: deployment
 
