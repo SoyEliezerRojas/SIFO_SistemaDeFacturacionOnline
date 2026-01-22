@@ -44,6 +44,10 @@ jobs:
         run: |
           cp dist/sifo/index.html dist/sifo/404.html
       
+      - name: Remove CNAME if exists (prevents GitHub Pages issues)
+        run: |
+          rm -f dist/sifo/CNAME || true
+      
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
