@@ -47,6 +47,7 @@ jobs:
       - name: Remove CNAME if exists (prevents GitHub Pages issues)
         run: |
           rm -f dist/sifo/CNAME || true
+          echo "CNAME removed from build directory"
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -55,5 +56,21 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/sifo
           cname: false
+          force_orphan: true
         id: deployment
+      
+      - name: Remove CNAME from gh-pages branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages || true
+          git checkout gh-pages
+          if [ -f CNAME ]; then
+            git rm CNAME
+            git commit -m "Remove CNAME file" || echo "No changes to commit"
+            git push origin gh-pages || echo "Push failed or no changes"
+          else
+            echo "CNAME does not exist, nothing to remove"
+          fi
+          git checkout main
 
