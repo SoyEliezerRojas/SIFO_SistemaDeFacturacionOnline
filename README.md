@@ -2,6 +2,8 @@
 
 Sistema web de facturación desarrollado con Angular que permite crear, gestionar y generar facturas en formato PDF. Este documento explica en detalle cómo funciona el sistema desde el punto de vista técnico y funcional.
 
+> **Última actualización**: Enero 2024
+
 ## 📋 Tabla de Contenidos
 
 1. [Requisitos Previos](#requisitos-previos)
